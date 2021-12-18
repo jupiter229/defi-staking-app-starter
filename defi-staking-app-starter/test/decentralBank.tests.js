@@ -52,4 +52,31 @@ contract('DecentralBank', ([owner, customer]) => {
             assert.equal(balance, tokens('1000000'))
         })
     })
+
+    describe('Yield Farming', async () => {
+        it('rewards tokens for stacking', async () => {
+            let result
+
+            // Check Investor Balance
+            result = await tether.balanceOf(customer)
+            assert.equal(result.toString(), tokens('100'), 'customer mock wallet balance before stacking')
+            
+            // Check Stacking For Customer
+            await tether.approve(decentralBank.address, tokens('100'), {from: customer})
+            await decentralBank.depositTokens(tokens('100'), {from: customer})
+
+            // Check Updated Balance of Customer
+            result = await tether.balanceOf(customer)
+            assert.equal(result.toString(), tokens('0'), 'customer updated balance')
+
+            // Check Updated Balance of Decentral Bank
+            result = await tether.balanceOf(decentralBank.address)
+            assert.equal(result.toString(), tokens('100'), 'decentral bank mock wallet after stacking from customer')
+
+            //Is Stacking Balance
+            result = await decentralBank.isStacking(customer)
+            assert.equal(result.toString(), 'true', "customer stacking status after stacking done")
+        })        
+    })
+
 })
