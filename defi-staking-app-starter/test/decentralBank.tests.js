@@ -6,11 +6,29 @@ require('chai')
 .use(require('chai-as-promised'))
 .should()
 
-contract('DecentralBank', (accounts) => {
+contract('DecentralBank', ([owner, customer]) => {
     //All of the code goes here for testing
+    function tokens(number) {
+        return web3.utils.toWei(number, 'ether')
+    }
+
+    let tether, rwd, decentralBank;
+
+    before(async () => {
+        //Load Contracts
+        tether = await Tether.new()
+        rwd = await RWD.new()
+        decentralBank = await DecentralBank.new(rwd.address, tether.address)
+        
+        //Transfer all tokens to the bank
+        await rwd.transfer(decentralBank.address, tokens('1000000'))
+
+        //Transfer 100 mock Tethers to Customer
+        await tether.transfer(customer, tokens('100'), {from: owner})
+    })
+
     describe('Mock Tether Deployment', async () => {
         it('matches name successfully', async () => {
-            let tether = await Tether.new()
             const name = await tether.name()
             assert.equal(name, 'Mock Tether Token')
         })
@@ -18,8 +36,7 @@ contract('DecentralBank', (accounts) => {
 
     describe('RWD Tether Deployment', async () => {
         it('matches name successfully', async () => {
-            let reward = await RWD.new()
-            const name = await reward.name()
+            const name = await rwd.name()
             assert.equal(name, 'Reward Token')
         })
     })
