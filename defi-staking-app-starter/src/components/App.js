@@ -6,6 +6,7 @@ import Web3 from 'web3';
 import Tether from '../truffle_abis/Tether.json'
 import RWD from '../truffle_abis/RWD.json'
 import DecentralBank from '../truffle_abis/DecentralBank.json'
+import { send } from 'process';
 
 class App extends Component {
     // Our react code goes here
@@ -78,6 +79,23 @@ class App extends Component {
         this.setState({loading: false})
     }
 
+    //stake Tokens
+    stakeTokens = (amount) => {
+        this.setState({loading: true})
+        this.state.tether.methods.approve(this.state.decentralBank._address, amount)
+        this.state.decentralBank.methods.depositTokens(amount).send({from: this.state.account}).on('transactionHash', (hash) => {
+            this.setState({loading: false})
+        })
+    }
+
+    //unStake Tokens
+    unStakeTokens = (amount) => {
+        this.setState({loading: true})
+        this.state.decentralBank.methods.unStakeTokens(amount).send({from: this.state.account}).on('transactionHash', (hash) => {
+            this.setState({loading: false})
+        })
+    }
+
     constructor(props) {
         super(props)
         this.state = {
@@ -93,6 +111,18 @@ class App extends Component {
     }
 
     render() {
+        let content
+        {this.state.loading ? content =
+            <p id="loading" className='text-center' style={{margin: '30px'}}>LOADING...</p> : 
+            content = 
+            <Main
+            tetherBalance={this.state.tetherBalance}
+            rwdBalance={this.state.rwdBalance}
+            stackingBalance={this.state.stackingBalance}
+            stakeTokens={this.stakeTokens}
+            unStakeTokens={this.unStakeTokens}
+            />
+        }
         return (
             <div>
                 <Navbar account={this.state.account}/>
@@ -100,7 +130,7 @@ class App extends Component {
                     <div className='row'>
                         <main role='main' className='col-lg-12 ml-auto mr-auto' style={{maxWidth: '600px', minHeight: '100vm' }}>
                             <div>
-                                <Main/>
+                                {content}
                             </div>
                         </main>
                     </div>

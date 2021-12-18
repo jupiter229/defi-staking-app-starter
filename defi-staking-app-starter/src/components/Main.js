@@ -1,4 +1,5 @@
 import React, {Component} from 'react'
+import Web3 from 'web3';
 import tether from '../tether.png';
 
 class Main extends Component {
@@ -16,22 +17,31 @@ class Main extends Component {
                     
                     <tbody>
                         <tr style={{color: 'blank'}}>
-                            <td>USDT</td>
-                            <td>RWD</td>
+                            <td>{Web3.utils.fromWei(this.props.stackingBalance, 'Ether')} USDT</td>
+                            <td>{Web3.utils.fromWei(this.props.rwdBalance, 'Ether')} RWD</td>
                         </tr>
                     </tbody>
                 </table>
                 <div className="card mb-2" style={{opacity: '.9'}}>
-                    <form className='mb-3'>
+                    <form 
+                    onSubmit={(event) => {
+                        event.preventDefault();
+                        let amount
+                        amount = this.input.value.toString();
+                        amount = window.web3.utils.toWei(amount, 'Ether');
+                        this.props.stakeTokens(amount)
+                    }}
+                    className='mb-3'>
                         <div style={{borderSpacing: '0 1em'}}>
                             <label className='float-left' style={{marginLeft: '15px'}}>
                                 <b>Stake Token</b>
                             </label>
                             <span className="float-right" style={{marginRight: '8px'}}>
-                                Balance:
+                                Balance: {Web3.utils.fromWei(this.props.tetherBalance, 'Ether')}
                             </span>
                             <div className="input-group mb-4">
                                 <input
+                                ref={(input)=>{this.input = input}}
                                 type="text"
                                 placeholder="0"
                                 required />
