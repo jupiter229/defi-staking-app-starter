@@ -83,6 +83,9 @@ contract('DecentralBank', ([owner, customer]) => {
 
             // Ensure it's only by owner
             await decentralBank.issueTokens({from: customer}).should.be.rejected;
+
+            //unstack tokens
+            await decentralBank.unStakeTokens({from: customer});
         })        
     })
 

@@ -41,6 +41,22 @@ contract DecentralBank {
         hasStacked[msg.sender] = true;
     }
 
+    // unstacking function
+    function unStakeTokens() public {
+        uint balance = stackingBalance[msg.sender];
+        require(balance > 0, 'unstacking balance cannot be zero');
+
+         //Transfer tether tokens to the customer
+        tether.transfer(msg.sender, balance);
+        
+        // Update Stacking Balance
+        stackingBalance[msg.sender] = 0;
+        
+        //Update Stacking Balance
+        isStacking[msg.sender] = false;
+        hasStacked[msg.sender] = false;
+    }
+
 
     // issue rewards
     function issueTokens() public {
